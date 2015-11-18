@@ -1,6 +1,6 @@
 settings:
     export_dir:
-        - projectfiles/$tool$/$project_name$
+        - projectfiles/{tool}/{project_name}
     tools:
         uvision:
             template:
@@ -82,3 +82,6 @@ projects:
         - *module_tools
         - records/projects/freescale/common/fsl_flash_driver.yaml
         - records/projects/freescale/targets/mk80f25615.yaml
+    ncs36510:
+        - *module_tools
+        - records/projects/onsemi/ncs36510.yaml
