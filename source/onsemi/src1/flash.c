@@ -32,15 +32,15 @@
  */
 #include "types.h"                     
 #include <stdio.h>
-#include "Interface.h" 
+//#include "Interface.h" 
 
 #include "flash_map.h"
 #include "flash.h"
-#include "assert.h"
+//#include "assert.h"
 #include "heap.h"
-#include "dma.h"
+//#include "dma.h"
 #include <string.h>
-#include "print.h"
+//#include "print.h"
 
 extern int debug_flag;   
 extern uint32_t firmwareAddress;
@@ -75,7 +75,7 @@ extern uint8_t numDev;
 /* Needs 32bit alignement to make sure DMA can handle the data */
 
 
-
+#if 0
 block_driver_t flash_driver = {
 		{
 		&fFlashCreate,
@@ -86,7 +86,7 @@ block_driver_t flash_driver = {
 		},
 		&fFlashRead,
 		&fFlashWrite };
-
+#endif
 //uint8_t GlobFlashPageCache[FLASH_PAGE_SIZE ] __attribute__((aligned (4)));
 
 //#pragma data_alignment=4
@@ -222,7 +222,7 @@ void fFlashMassErase(flash_device_pt device)
 boolean fFlashCreate(device_pt *device) {
 
  
-        fPrintf("Create device for Flash %d", numDev);
+        //fprintf("Create device for Flash %d", numDev);
  
         ++ numDev;  
 
@@ -238,8 +238,8 @@ boolean fFlashCreate(device_pt *device) {
 
 	// add the device to the driver's device list
 	*device = &(d->device);
-	(d->device).next = flash_driver.driver.deviceList;
-	flash_driver.driver.deviceList = &(d->device);
+//	(d->device).next = flash_driver.driver.deviceList;
+//	flash_driver.driver.deviceList = &(d->device);
 
 	// device is not active yet
 	(d->device).open = False;
@@ -318,16 +318,16 @@ boolean fFlashWrite(device_pt device, uint8_t **address, const uint8_t *buf, uin
  
 	flash_device_pt d = (flash_device_pt) device;
         if (d == Null) {
-          fPrintf("Device is null");
+          //fprintf("Device is null");
         }
 	if ((device->open) != True) {
-                fPrintf("device not open");
+                //fprintf("device not open");
 		return False;
 	}
         
         destination = (((flash_device_pt) (device))->array_base_address) + (uint8_t*) (*address);
         
-        fPrintf("Destination = %0x", destination);
+        //fprintf("Destination = %0x", destination);
         page_address = (uint8_t*) ((uint32_t) destination & FLASH_PAGE_MASK );
 	page_size = FLASH_PAGE_SIZE;
        
@@ -378,8 +378,11 @@ boolean fFlashWrite(device_pt device, uint8_t **address, const uint8_t *buf, uin
 	fFlashUnlock(d);
 
 	/* Commit the page to flash */
-	fDmaStart((uint32_t) page_address, (uint32_t) GlobFlashPageCache, page_size);
-	fDmaStallUntilDone();
+
+//Implement without DMA / Interrupt??
+//#error "Need to update this part"
+//	fDmaStart((uint32_t) page_address, (uint32_t) GlobFlashPageCache, page_size);
+//	fDmaStallUntilDone();
   
         *address += len;
 
@@ -398,7 +401,7 @@ boolean fFlashIoctl(device_pt device, uint32_t request, void *argument)
 {
 	flash_device_pt d = (flash_device_pt) device;
 	if (!device->open) {
-          FlMessageBox("Flash not open");
+          //FlMessageBox("Flash not open");
           return False;
 	}
 	switch (request) {

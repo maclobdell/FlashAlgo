@@ -29,7 +29,7 @@
  */
 #include "heap.h"
 #include "types.h"
-#include "print.h"
+//#include "print.h"
 
 #define HEAP_SIZE			(uint8_t)0xFF
 #define NUM_HEAPVECTORS		(uint8_t)0x05

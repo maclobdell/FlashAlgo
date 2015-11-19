@@ -35,6 +35,8 @@
 #ifndef DEVICE_H_
 #define DEVICE_H_
 
+#include "types.h"                     
+
 /** A generic device structure. */
 typedef struct device {
 	boolean open;

@@ -29,7 +29,7 @@
 #ifndef _FLASH_H_
 #define _FLASH_H_
 
-#include "block_driver.h"
+//#include "block_driver.h"
 #include "flash_map.h"
 #include <stdint.h>
 #include "device.h"
@@ -99,6 +99,6 @@ boolean fFlashIoctl(device_pt device, uint32_t request, void *argument);
 void fFlashPageErase(flash_device_pt device, uint32_t address);
 void fFlashPowerUp(flash_device_pt device);
 void fFlashStallUntilNotBusy(flash_device_pt device);
-extern block_driver_t flash_driver;
+//extern block_driver_t flash_driver;
 
 #endif // FLASH_H_
