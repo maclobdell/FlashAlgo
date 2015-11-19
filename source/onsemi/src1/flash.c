@@ -379,8 +379,8 @@ boolean fFlashWrite(device_pt device, uint8_t **address, const uint8_t *buf, uin
 
 	/* Commit the page to flash */
 
-//Implement without DMA / Interrupt??
-//#error "Need to update this part"
+//Note to OnSemi - can this be implemented without requiring interrupts??
+#error "Need to write data to flash here."
 //	fDmaStart((uint32_t) page_address, (uint32_t) GlobFlashPageCache, page_size);
 //	fDmaStallUntilDone();
   

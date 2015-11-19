@@ -57,30 +57,6 @@ const flash_options_t GlobFlashOptionsB = {
 };
 
 uint8_t numDev;
-//extern block_driver_t flash_driver;
-//extern DmaDescr_t GlobDmaDescr;
-//extern uint32_t __Vectors;
-//extern void fDmaDefaultCallBack();
-
-//uint32_t __cs3_stack =  0x40000000;
-
-#if 0
-uint32_t FlashInit(void *base_of_flash, uint32_t image_size,
-                   uint32_t link_address, uint32_t flags);
-
-uint32_t FlashWrite(void *block_start,
-                    uint32_t offset_into_block,
-                    uint32_t count,
-                    char const *buffer);
-
-uint32_t FlashErase(void *block_start,
-                    uint32_t block_size);
-#endif
-
-//Need to remove all code derived from flash_loader template files and functions in the future.
-//Note to OnSemi: Perhaps orion_flash.c can be bypassed and this file can call your
-//                posix style flash driver in flash.c directly.  this is up to you.
-//                this would eliminate extra layers and complexity.
 
 uint32_t Init(uint32_t adr, uint32_t clk, uint32_t fnc)
 {
@@ -89,9 +65,6 @@ uint32_t Init(uint32_t adr, uint32_t clk, uint32_t fnc)
     //  access or program memory. Fnc parameter has meaning
     //  but currently isnt used in MSC programming routines
   
-#if 0  
-    uint32_t success_flag = RESULT_ERROR;
-#endif   
 
 	/* Disable all interrupts */
     NVIC->ICER[0] = 0x1F;
@@ -99,7 +72,8 @@ uint32_t Init(uint32_t adr, uint32_t clk, uint32_t fnc)
     NVIC->ICPR[0] = 0x1F;
     /* Clear all pending SV and systick */
     SCB->ICSR = (uint32_t)0x0A000000;
-#if 0
+
+	#if 0
     /* Relocate the exception vector table from default 0x0 to the location in RAM
      * from this download */
     __DSB();
@@ -109,72 +83,6 @@ uint32_t Init(uint32_t adr, uint32_t clk, uint32_t fnc)
 	 __DSB();
 #endif
 
-#if 0
-    success_flag = FlashInit((void *)adr, 0, 0, 0);  //args not used
-
-    return success_flag;  // 0 on success, an error code otherwise
-#endif
-
-/*REFACTORING TO REMOVE LAYERS */
-#if 0
-     boolean retVal = True;
-   //  int32_t successFlag = 0;
-   //  int32_t addrVer[2];
-     
-     fInitGobjects();
-     
-     /* Read firmware base address and size */
-     //successFlag=fReadFwbaseAddVer(BINFILENAME,(int32_t *)addrVer);  
-       
-  //   if(successFlag != 0)
-  //   {   
-  //     FlMessageBox("Error Reading  FW Base address and Version Number\n");
-  //     return RESULT_ERROR;
-  //   }  
-   //  firmwareAddress = (uint32_t)addrVer[0];
-     
-     retVal = flash_driver.driver.create(&GlobFlashDeviceA);
-     if (retVal != True) {
-     //   FlMessageBox("Create Flash A driver failed ");
-        return(RESULT_ERROR);
-     }
-     
-     retVal = flash_driver.driver.open(GlobFlashDeviceA, (void*) &GlobFlashOptionsA);
-     if (retVal != True) {
-      //FlMessageBox("Open Flash A driver failed");
-      return(RESULT_ERROR);
-     }
-
-     retVal = flash_driver.driver.create(&GlobFlashDeviceB);
-     if (retVal != True) {
-       //FlMessageBox("Create Flash B driver failed ");
-       return(RESULT_ERROR);
-     }
-     retVal = flash_driver.driver.open(GlobFlashDeviceB, (void*) &GlobFlashOptionsB);
-     if (retVal != True) {
-      //FlMessageBox("Open Flash B driver failed");
-      return(RESULT_ERROR);
-     }
- /*    retVal = flash_driver.driver.ioctl(GlobFlashDeviceB, FLASH_POWER_UP, 0);
-     if (retVal != True) 
-     {
-       FlMessageBox("Flash B power up failed");
-       return(RESULT_ERROR);
-     }
-*/
-     //if ((firmwareAddress & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK)
-		 if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK)
-     {
-     //  fPrintf("Binary for flash B, power UP B and DOWN A.\n");
-       flash_driver.driver.ioctl(GlobFlashDeviceB, FLASH_POWER_UP, 0);
-       flash_driver.driver.ioctl(GlobFlashDeviceA, FLASH_POWER_DOWN, 0);
-     } else {
-      // fPrintf("Binary for flash A, power UP A and power DOWN B.\n");
-       flash_driver.driver.ioctl(GlobFlashDeviceA, FLASH_POWER_UP, 0);
-	     flash_driver.driver.ioctl(GlobFlashDeviceB, FLASH_POWER_DOWN, 0);
-     }
-     return RESULT_OK;
-#endif
 /*REFACTORING AGAIN TO MAKE POSITION INDEPENDENT */
 		 
 	    boolean retVal = True;
@@ -294,73 +202,7 @@ uint32_t EraseSector(uint32_t adr)
 
 uint32_t ProgramPage(uint32_t adr, uint32_t sz, uint32_t *buf)
 {
-#if 0		
-    // Program the contents of buf starting at adr for length of sz
-    uint32_t success_flag = RESULT_ERROR;
-    
-    uint32_t block_start;
-    uint32_t offset_into_block; 
-    
-    if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK) {
-      block_start = FLASH_B_OFFSET_MASK;
-    }else{
-      block_start = 0;
-    }  
-
-    offset_into_block = adr - block_start;
-    //offset_into_block = adr & ~block_start;  //alternative
-  
-
-    success_flag = FlashWrite((void *) block_start,
-                                 offset_into_block,
-                                                sz,
-                             (const char *) buf);
-
-		return success_flag;
-		
-#endif   
-		
-		
-/*REFACTORING TO REMOVE LAYER */
-#if 0
-		//unsigned char success_flag;                                  
-    boolean retVal = True;
-		
-    //t1_dptr= ((uint8_t *)block_start)+offset_into_block;   
-
-    //fPrintf("FIB base = %0x", firmwareAddress);
-    
-    /* Write to flash A or Flash B depending on the flash bank in use */
-    //if ((firmwareAddress & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK) {
-      if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK) {
-				
-      //t1_dptr =(uint8_t *)((uint32_t)block_start ^ FLASH_B_OFFSET_MASK);
-      
-      //fPrintf("Write 0x%x bytes to flash B, 0x%x\n", count, t1_dptr);
-      //success_flag=flash_driver.write(GlobFlashDeviceB,(uint8_t **)&t1_dptr,
-      //                                     (uint8_t const *)buffer,count);
-			retVal =flash_driver.write(GlobFlashDeviceB,(uint8_t **)&adr,
-                                           (uint8_t const *)buf,sz);
-				
-    } else {
-      
-      //fPrintf("Write 0x%x bytes to flash A, 0x%x\n", count, t1_dptr);
-      //success_flag=flash_driver.write(GlobFlashDeviceA,(uint8_t **)&t1_dptr,
-      //                                     (uint8_t const *)buffer,count); 
-      retVal=flash_driver.write(GlobFlashDeviceA,(uint8_t **)&adr,
-                                           (uint8_t const *)buf,sz); 
-
-    }
-    
-    if(retVal==True)  
-    {
-      return RESULT_OK;
-    }  
-    
-    return RESULT_ERROR;
-#endif		
-
-		//unsigned char success_flag;                                  
+	//unsigned char success_flag;                                  
     boolean retVal = True;
 		
     //t1_dptr= ((uint8_t *)block_start)+offset_into_block;   
@@ -410,33 +252,3 @@ uint32_t Verify(uint32_t adr, uint32_t sz, uint32_t *buf)
 
     return 1;
 }
-
-#if 0
-/**
- *  This function initializes function pointers for read and write of flash 
- *  as well as driver related initializtion
- *  @param          void  
- *  @return         void  
-*/
-void fInitGobjects(void)
-{
-     flash_driver.driver.create=&fFlashCreate;
-     flash_driver.driver.open= &fFlashOpen;
-     flash_driver.driver.close=&fFlashClose;
-     flash_driver.driver.ioctl= &fFlashIoctl;
-     flash_driver.driver.deviceList=Null; 
-     flash_driver.read=&fFlashRead;  
-     flash_driver.write=&fFlashWrite;
-
-     numDev = 0;
-     
-    // GlobDmaDescr.lock=0; 
-    // GlobDmaDescr.callback=fDmaDefaultCallBack;
-     
-}
-
-void fInitRam(void)
-{
-	//empty implementation for this project
-}	
-#endif
