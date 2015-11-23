@@ -30,7 +30,7 @@ import sys, os, collections
 # FIXED LENGTH - remove and these (shrink offset to 4 for bkpt only)
 # defines better documented
 ALGO_OFFSET = 0x20
-BLOB_START = 0x20000000
+BLOB_START = 0x3FFF4000
 BLOB_HEADER = '0xE00ABE00, 0x062D780D, 0x24084068, 0xD3000040, 0x1E644058, 0x1C49D1FA, 0x2A001E52, 0x4770D1F2,'
 SP = BLOB_START + 2048
 PROG_PAGE_SIZE = 512
@@ -138,7 +138,8 @@ def decode_axf(string):
                     continue
                 
                 name, loc, sec = t[1], t[2], t[4]
-                if name in ['EraseChip', 'EraseSector', 'Init', 'ProgramPage', 'UnInit', 'Verify']:
+                #if name in ['EraseChip', 'EraseSector', 'Init', 'ProgramPage', 'UnInit', 'Verify']:
+                if name in ['Init', 'UnInit', 'EraseChip', 'EraseSector', 'ProgramPage', 'Verify']:
                     addr = BLOB_START + ALGO_OFFSET + int(loc, 16)
                     dic['func'].update({'%s' % name : '0x%08X' % addr})
 
@@ -160,4 +161,3 @@ if __name__ == '__main__':
     data = decode_axf(sys.argv[1])
     generate_blob(os.path.dirname(os.path.realpath(__file__)) + '\\' + 'c_blob.tmpl', 'h', data)
     generate_blob(os.path.dirname(os.path.realpath(__file__)) + '\\' + 'py_blob.tmpl', 'py', data)
-
