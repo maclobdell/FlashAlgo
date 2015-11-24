@@ -21,39 +21,29 @@
 #include "core_cm3.h"
 #include "types.h" 
 #include "flash.h"
-//#include "dma.h"
-//#include "fib.h"
-//#include "Interface.h"
-//#include "print.h"
 
 #include "FlashOS.h"
 #include "FlashPrg.h"
 
-#define RESULT_OK                   0
-#define RESULT_ERROR                1
+#define RESULT_OK		0
+#define RESULT_ERROR	1
 
 void fInitGobjects(void);
 void fInitRam(void);  
 
-/** Global flash A device pointer*/
-device_pt GlobFlashDeviceA;
-
-/** Global flash B device pointer */
-device_pt GlobFlashDeviceB;
-
 /** Global flash A device options */
-const flash_options_t GlobFlashOptionsA = {
-		(uint32_t*)0x00000000,
-		FLASHREG,
-		Flash_IRQn
-
+const flash_options_t GlobFlashOptionsA = 
+{
+	0x00000000,
+	FLASHREG,
+	Flash_IRQn
 };
 /** Global flash B device options */
-const flash_options_t GlobFlashOptionsB = {
-		(uint32_t*)0x00100000,
-		FLASHREG,
-		Flash_IRQn
-
+const flash_options_t GlobFlashOptionsB = 
+{
+	0x00100000,
+	FLASHREG,
+	Flash_IRQn
 };
 
 uint8_t numDev;
@@ -73,86 +63,26 @@ uint32_t Init(uint32_t adr, uint32_t clk, uint32_t fnc)
     /* Clear all pending SV and systick */
     SCB->ICSR = (uint32_t)0x0A000000;
 
-	#if 0
+#if 0
     /* Relocate the exception vector table from default 0x0 to the location in RAM
      * from this download */
     __DSB();
     /* MSbit = 0 vector table in code region, 1 vector table in ram region */
-    //SCB->VTOR = (uint32_t)&__vector_table;
-			SCB->VTOR = (uint32_t)&__Vectors;   
-	 __DSB();
+	SCB->VTOR = (uint32_t)&__Vectors;   
+	__DSB();
 #endif
 
-/*REFACTORING AGAIN TO MAKE POSITION INDEPENDENT */
-		 
-	    boolean retVal = True;
-   //  int32_t successFlag = 0;
-   //  int32_t addrVer[2];
-     
-   //  fInitGobjects();
-     
-     /* Read firmware base address and size */
-     //successFlag=fReadFwbaseAddVer(BINFILENAME,(int32_t *)addrVer);  
-       
-  //   if(successFlag != 0)
-  //   {   
-  //     FlMessageBox("Error Reading  FW Base address and Version Number\n");
-  //     return RESULT_ERROR;
-  //   }  
-   //  firmwareAddress = (uint32_t)addrVer[0];
-     
-     //retVal = flash_driver.driver.create(&GlobFlashDeviceA);
-     retVal = fFlashCreate(&GlobFlashDeviceA);
-
-		if (retVal != True) {
-     //   FlMessageBox("Create Flash A driver failed ");
-        return(RESULT_ERROR);
-     }
-     
-     //retVal = flash_driver.driver.open(GlobFlashDeviceA, (void*) &GlobFlashOptionsA);
-     retVal = fFlashOpen(GlobFlashDeviceA, (void*) &GlobFlashOptionsA);
-		 
-		 if (retVal != True) {
-      //FlMessageBox("Open Flash A driver failed");
-      return(RESULT_ERROR);
-     }
-
-     //retVal = flash_driver.driver.create(&GlobFlashDeviceB);
-		 retVal = fFlashCreate(&GlobFlashDeviceB);
-     if (retVal != True) {
-       //FlMessageBox("Create Flash B driver failed ");
-       return(RESULT_ERROR);
-     }
-     //retVal = flash_driver.driver.open(GlobFlashDeviceB, (void*) &GlobFlashOptionsB);
-     retVal = fFlashOpen(GlobFlashDeviceB, (void*) &GlobFlashOptionsB);
-		 if (retVal != True) {
-      //FlMessageBox("Open Flash B driver failed");
-      return(RESULT_ERROR);
-     }
- /*    retVal = flash_driver.driver.ioctl(GlobFlashDeviceB, FLASH_POWER_UP, 0);
-     if (retVal != True) 
-     {
-       FlMessageBox("Flash B power up failed");
-       return(RESULT_ERROR);
-     }
-*/
-     //if ((firmwareAddress & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK)
-		 if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK)
-     {
-     //  fPrintf("Binary for flash B, power UP B and DOWN A.\n");
-       //flash_driver.driver.ioctl(GlobFlashDeviceB, FLASH_POWER_UP, 0);
-			 fFlashIoctl(GlobFlashDeviceB, FLASH_POWER_UP, 0);
-       //flash_driver.driver.ioctl(GlobFlashDeviceA, FLASH_POWER_DOWN, 0);
-			 fFlashIoctl(GlobFlashDeviceA, FLASH_POWER_DOWN, 0);
-     } else {
-      // fPrintf("Binary for flash A, power UP A and power DOWN B.\n");
-       //flash_driver.driver.ioctl(GlobFlashDeviceA, FLASH_POWER_UP, 0);
-	     fFlashIoctl(GlobFlashDeviceA, FLASH_POWER_UP, 0);
-			 //flash_driver.driver.ioctl(GlobFlashDeviceB, FLASH_POWER_DOWN, 0);
-			 fFlashIoctl(GlobFlashDeviceB, FLASH_POWER_DOWN, 0);
+	if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK)
+	{
+		fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_POWER_UP, 0);
+		fFlashIoctl((flash_options_pt)&GlobFlashOptionsA, FLASH_POWER_DOWN, 0);
+	} 
+	else 
+	{
+	    fFlashIoctl((flash_options_pt)&GlobFlashOptionsA, FLASH_POWER_UP, 0);
+		fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_POWER_DOWN, 0);
      }
      return RESULT_OK;
-	 
 }
 
 uint32_t UnInit(uint32_t fnc)
@@ -162,93 +92,60 @@ uint32_t UnInit(uint32_t fnc)
     //  Fnc parameter has meaning but isnt used in MSC program
     //  routines
 
-   //Note to OnSemi: Anything to be done here?
+   	/* TODO Optional API? */
 
-    return 0;  //success
+    return RESULT_OK;
 }
 
 uint32_t BlankCheck(uint32_t adr, uint32_t sz, uint8_t pat)
 {
-    // Check that the memory at address adr for length sz is 
-    //  empty or the same as pat
-    
-   //note to OnSemi - this function is optional 
-      
-    return 1;
+	/* Optional API */
+    return RESULT_OK; 
 }
 
 uint32_t EraseChip(void)
 {
-    // Execute a sequence that erases the entire of flash memory region 
+	/* Erases the entire of flash memory region both flash A & B */
 
-  //Note to OnSemi: Please implement FlashMassErase in orion_flash.c
-  //FlashMassErase should call fFlashMassErase or ioctl command that calls it
-
-	// Write call is doing erase by itself        
-      return RESULT_OK;
-    
+	fFlashMassErase((flash_options_pt)&GlobFlashOptionsA);
+	fFlashMassErase((flash_options_pt)&GlobFlashOptionsB);
+   
+	return RESULT_OK;
 }
 
 uint32_t EraseSector(uint32_t adr)
 {
-    // Execute a sequence that erases the sector that adr resides in
-
-    //Note to OnSemi: Please implement FlashErase in orion_flash.c
-    //or maybe this is not needed because the flash driver is always erasing before programming
-    
-	// Write call is doing erase by itself        
+	/* Optional API */
+	/* Write call is doing erase by itself */
       return RESULT_OK;
 }
 
 uint32_t ProgramPage(uint32_t adr, uint32_t sz, uint32_t *buf)
 {
-	//unsigned char success_flag;                                  
     boolean retVal = True;
-		
-    //t1_dptr= ((uint8_t *)block_start)+offset_into_block;   
 
-    //fPrintf("FIB base = %0x", firmwareAddress);
-    
-    /* Write to flash A or Flash B depending on the flash bank in use */
-    //if ((firmwareAddress & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK) {
-      if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK) {
-				
-      //t1_dptr =(uint8_t *)((uint32_t)block_start ^ FLASH_B_OFFSET_MASK);
-      
-      //fPrintf("Write 0x%x bytes to flash B, 0x%x\n", count, t1_dptr);
-      //success_flag=flash_driver.write(GlobFlashDeviceB,(uint8_t **)&t1_dptr,
-      //                                     (uint8_t const *)buffer,count);
-			//retVal =flash_driver.write(GlobFlashDeviceB,(uint8_t **)&adr,
-      //                                     (uint8_t const *)buf,sz);
-				
-				retVal =fFlashWrite(GlobFlashDeviceB,(uint8_t **)&adr,
+	/* Write to flash A or Flash B depending on the flash bank in use */
+	if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK) 
+	{
+		retVal = fFlashWrite((flash_options_pt)&GlobFlashOptionsB,(uint8_t **)&adr,
                                            (uint8_t const *)buf,sz);
-				
-    } else {
-      
-      //fPrintf("Write 0x%x bytes to flash A, 0x%x\n", count, t1_dptr);
-      //success_flag=flash_driver.write(GlobFlashDeviceA,(uint8_t **)&t1_dptr,
-      //                                     (uint8_t const *)buffer,count); 
-      //retVal=flash_driver.write(GlobFlashDeviceA,(uint8_t **)&adr,
-      //                                     (uint8_t const *)buf,sz); 
-        retVal=fFlashWrite(GlobFlashDeviceA,(uint8_t **)&adr,
+    } 
+	else 
+	{
+        retVal = fFlashWrite((flash_options_pt)&GlobFlashOptionsA,(uint8_t **)&adr,
                                            (uint8_t const *)buf,sz); 
     }
     
-    if(retVal==True)  
+    if(retVal == True)  
     {
       return RESULT_OK;
     }  
     
     return RESULT_ERROR;		
-		
 }
 
 uint32_t Verify(uint32_t adr, uint32_t sz, uint32_t *buf)
 {
-    // Given an adr and sz compare this against the content of buf
-
-    //note to OnSemi - this function is optional 
-
-    return 1;
+	/* Optional API */
+    return RESULT_OK;
 }

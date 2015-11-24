@@ -1,4 +1,4 @@
-/* Flash OS Routines
+/** Flash OS Routines
  * Copyright (c) 2009-2015 ARM Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@ struct FlashDevice const FlashDevice = {
     DEVICE_NAME,                // Device Name (128 chars max)
     ONCHIP,                     // Device Type
     0x00003000,                 // Device Start Address
-    0x00152000,                 // Device Size
+    0x000A0000,                 // Device Size
     0x00000800,                 // Programming Page Size
     0x00000000,                 // Reserved, must be 0
     0xFF,                       // Initial Content of Erased Memory
@@ -35,3 +35,4 @@ struct FlashDevice const FlashDevice = {
     {{0x00000400, 0x00000000},  // Sector Size {1kB, starting at address 0}
     {SECTOR_END}}
 };
+

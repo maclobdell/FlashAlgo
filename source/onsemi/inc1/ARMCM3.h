@@ -1,4 +1,4 @@
-/**************************************************************************//**
+/**
  * @file     ARMCM3.h
  * @brief    CMSIS Cortex-M3 Core Peripheral Access Layer Header File
  *           for CM3 Device Series
