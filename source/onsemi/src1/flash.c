@@ -85,7 +85,7 @@ void fFlashUnlock(flash_options_pt device)
 {
 	device->membase->UNLOCK1 = CTRL_UNLOCK1;
 
-	if (device->array_base_address && FLASH_B_OFFSET_MASK) 
+	if (device->array_base_address & FLASH_B_OFFSET_MASK) 
 	{/* Flash B */
 		device->membase->UNLOCKB = CTRL_UNLOCK2;
 	} 
@@ -101,7 +101,7 @@ void fFlashUnlock(flash_options_pt device)
  */
 void fFlashStallUntilNotBusy(flash_options_pt device)
 {
-	if (device->array_base_address && FLASH_B_OFFSET_MASK) 
+	if (device->array_base_address & FLASH_B_OFFSET_MASK) 
 	{/* Check flash B busy */
 		while (device->membase->STATUS.BITS.FLASH_B_BUSY);
 	}
@@ -117,7 +117,7 @@ void fFlashStallUntilNotBusy(flash_options_pt device)
  */
 void fFlashPowerDown(flash_options_pt device)
 {
-	if (device->array_base_address && FLASH_B_OFFSET_MASK) 
+	if (device->array_base_address & FLASH_B_OFFSET_MASK) 
 	{/* Flash B */
 		device->membase->CONTROL.BITS.FLASHB_PD = CTRL_POWER_DOWN;
 	} 
@@ -133,7 +133,7 @@ void fFlashPowerDown(flash_options_pt device)
  */
 void fFlashPowerUp(flash_options_pt device)
 {
-	if (device->array_base_address && FLASH_B_OFFSET_MASK) 
+	if (device->array_base_address & FLASH_B_OFFSET_MASK) 
 	{/* Flash B */
 		device->membase->CONTROL.BITS.FLASHB_PD = CTRL_POWER_UP;
 	} 
@@ -173,7 +173,7 @@ void fFlashMassErase(flash_options_pt device)
 	/* Only one mass erase control address is available for both flash banks.
 	 * Hardware is masking least significant bits to identify what page
 	 * in what flash needs to be erased. */
-	if (device->array_base_address && FLASH_B_OFFSET_MASK) 
+	if (device->array_base_address & FLASH_B_OFFSET_MASK) 
 	{/* Flash device is on flash bank B. Add bank B offset to address. */
 		device->membase->ADDR = FLASH_B_OFFSET_MASK;
 	} else 
