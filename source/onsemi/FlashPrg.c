@@ -21,7 +21,7 @@
 #include "core_cm3.h"
 #include "types.h" 
 #include "flash.h"
-
+#include "clock.h"
 #include "FlashOS.h"
 #include "FlashPrg.h"
 
@@ -55,6 +55,7 @@ uint32_t Init(uint32_t adr, uint32_t clk, uint32_t fnc)
     //  access or program memory. Fnc parameter has meaning
     //  but currently isnt used in MSC programming routines
   
+	CLOCK_ENABLE(CLOCK_FLASH);
 
 	/* Disable all interrupts */
     NVIC->ICER[0] = 0x1F;
@@ -117,7 +118,15 @@ uint32_t EraseSector(uint32_t adr)
 {
 	/* Optional API */
 	/* Write call is doing erase by itself */
-      return RESULT_OK;
+	if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK)
+	{/* Flash B */
+		fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_PAGE_ERASE_REQUEST, &adr);
+	}
+	else
+	{/* Flash A */
+		fFlashIoctl((flash_options_pt)&GlobFlashOptionsA, FLASH_PAGE_ERASE_REQUEST, &adr);
+	}
+    return RESULT_OK;
 }
 
 uint32_t ProgramPage(uint32_t adr, uint32_t sz, uint32_t *buf)

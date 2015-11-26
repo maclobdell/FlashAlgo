@@ -280,11 +280,11 @@ boolean fFlashWrite(flash_options_pt device, uint8_t **address, const uint8_t *b
 	}
 
     /* Read full page into RAM */
-	memcpy(GlobFlashPageCache, page_address, FLASH_PAGE_SIZE);
+	memcpy((void *)GlobFlashPageCache, (void *)page_address, FLASH_PAGE_SIZE);
 
     /* Partially overwrite the content of the page in RAM */
 	in_page_offset = (uint8_t*) ((uint32_t) (*address) & ~FLASH_PAGE_MASK );
-	memcpy(GlobFlashPageCache + (uint32_t) in_page_offset, buf, len);
+	memcpy((void *)(GlobFlashPageCache + (uint32_t) in_page_offset), (void *)buf, len);
 
 	/* Order page erase of the target page.  Just use the destination address
 	 * to program page erase, hardware makes sure the correct page is erased
@@ -304,7 +304,7 @@ boolean fFlashWrite(flash_options_pt device, uint8_t **address, const uint8_t *b
 	//#error "Need to write data to flash here."/* TODO */
 	//	fDmaStart((uint32_t) page_address, (uint32_t) GlobFlashPageCache, page_size);
 	//	fDmaStallUntilDone();
-	memcpy(page_address, GlobFlashPageCache, page_size);
+	memcpy((void *)page_address, (void *)GlobFlashPageCache, page_size);
   
 	*address += len;
 
