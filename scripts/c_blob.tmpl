@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
+#include "flash_blob.h"
+
 static const uint32_t {{name}}_flash_prog_blob[] = {
     {{prog_header}}
     {{mem}}
 };
 
-static const TARGET_FLASH flash_algorithm_struct = {
-    {{func['Init']}}, // Init
-    {{func['UnInit']}}, // UnInit
-    {{func['EraseChip']}}, // EraseChip
-    {{func['EraseSector']}}, // EraseSector
-    {{func['ProgramPage']}}, // ProgramPage
+static const program_target_t flash = {
+    {{func['init']}}, // init
+    {{func['uninit']}}, // uninit
+    {{func['eraseAll']}}, // eraseAll
+    {{func['erase_sector']}}, // erase_sector
+    {{func['program_page']}}, // program_page
 
     // BKPT : start of blob + 1
     // RSB  : blob start + header + rw data offset
@@ -41,4 +43,3 @@ static const TARGET_FLASH flash_algorithm_struct = {
     {{name}}_flash_prog_blob,         // address of prog_blob
     {{prog_page_size}}                 // ram_to_flash_bytes_to_be_written
 };
-
