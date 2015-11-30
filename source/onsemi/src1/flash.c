@@ -280,18 +280,19 @@ boolean fFlashWrite(flash_options_pt device, uint8_t **address, const uint8_t *b
 	}
 
     /* Read full page into RAM */
-	memcpy((void *)GlobFlashPageCache, (void *)page_address, FLASH_PAGE_SIZE);
+//	memcpy((void *)GlobFlashPageCache, (void *)page_address, FLASH_PAGE_SIZE);
 
     /* Partially overwrite the content of the page in RAM */
-	in_page_offset = (uint8_t*) ((uint32_t) (*address) & ~FLASH_PAGE_MASK );
-	memcpy((void *)(GlobFlashPageCache + (uint32_t) in_page_offset), (void *)buf, len);
+//	in_page_offset = (uint8_t*) ((uint32_t) (*address) & ~FLASH_PAGE_MASK );
+//	memcpy((void *)(GlobFlashPageCache + (uint32_t) in_page_offset), (void *)buf, len);
 
 	/* Order page erase of the target page.  Just use the destination address
 	 * to program page erase, hardware makes sure the correct page is erased
 	 */
-	fFlashPageErase(device, (uint32_t) *address);
+	/* Erases are handled by calling application */ 
+	//fFlashPageErase(device, (uint32_t) *address);
 
-	fFlashStallUntilNotBusy(device);
+	//fFlashStallUntilNotBusy(device);
 
 	/* Make sure the CM3 hangs while write is ongoing */
 	device->membase->CONTROL.BITS.WRITE_BLOCK = CTRL_STALL_ON_WRITE;
@@ -300,11 +301,10 @@ boolean fFlashWrite(flash_options_pt device, uint8_t **address, const uint8_t *b
 
 	/* Commit the page to flash */
 
-	//Note to OnSemi - can this be implemented without requiring interrupts??
-	//#error "Need to write data to flash here."/* TODO */
 	//	fDmaStart((uint32_t) page_address, (uint32_t) GlobFlashPageCache, page_size);
 	//	fDmaStallUntilDone();
-	memcpy((void *)page_address, (void *)GlobFlashPageCache, page_size);
+	//memcpy((void *)page_address, (void *)GlobFlashPageCache, page_size);
+	memcpy((void *)page_address, (void *)buf, page_size);
   
 	*address += len;
 
