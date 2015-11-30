@@ -31,13 +31,13 @@
     @param fnc function code (1 - Erase, 2 - Program, 3 - Verify)
     @return 0 on success, an error code otherwise
  */
-uint32_t Init(uint32_t adr, uint32_t clk, uint32_t fnc);
+uint32_t init(uint32_t adr, uint32_t clk, uint32_t fnc);
 
 /** De-Initialize programming functions [optional]
     @param fnc function code (1 - Erase, 2 - Program, 3 - Verify)
     @return 0 on success, an error code otherwise
  */
-uint32_t UnInit(uint32_t fnc);
+uint32_t uninit(uint32_t fnc);
 
 /** Check region for erased memory
     @param adr address to start from
@@ -50,13 +50,13 @@ uint32_t BlankCheck(uint32_t adr, uint32_t sz, uint8_t pat);
 /** Perform a full chip erase
     @return 0 on success, an error code otherwise
  */
-uint32_t EraseChip(void);
+uint32_t eraseAll(void);
 
 /** Erase a single sector of memory
     @param adr address of a sector to erase
     @return 0 on success, an error code otherwise
  */
-uint32_t EraseSector(uint32_t adr);
+uint32_t erase_sector(uint32_t adr);
 
 /** Program data into memory
     @param adr address to start programming from
@@ -64,7 +64,7 @@ uint32_t EraseSector(uint32_t adr);
     @param buf memory contents to be programmed
     @return 0 on success, an error code otherwise
  */
-uint32_t ProgramPage(uint32_t adr, uint32_t sz, uint32_t *buf);
+uint32_t program_page(uint32_t adr, uint32_t sz, uint32_t *buf);
 
 /** Verify contents in memory
     @param adr start address of the verification
@@ -72,7 +72,7 @@ uint32_t ProgramPage(uint32_t adr, uint32_t sz, uint32_t *buf);
     @param buf memory contents to be compared against
     @return 0 on success, an error code otherwise
  */
-uint32_t Verify(uint32_t adr, uint32_t sz, uint32_t *buf);
+uint32_t verify(uint32_t adr, uint32_t sz, uint32_t *buf);
 
 #ifdef __cplusplus
   }

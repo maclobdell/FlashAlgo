@@ -48,7 +48,7 @@ const flash_options_t GlobFlashOptionsB =
 
 uint8_t numDev;
 
-uint32_t Init(uint32_t adr, uint32_t clk, uint32_t fnc)
+uint32_t init(uint32_t adr, uint32_t clk, uint32_t fnc)
 {
     // Called to configure the SoC. Should enable clocks
     //  watchdogs, peripherals and anything else needed to
@@ -86,7 +86,7 @@ uint32_t Init(uint32_t adr, uint32_t clk, uint32_t fnc)
      return RESULT_OK;
 }
 
-uint32_t UnInit(uint32_t fnc)
+uint32_t uninit(uint32_t fnc)
 {
     // When a session is complete this is called to powerdown
     //  communication channels and clocks that were enabled
@@ -104,7 +104,7 @@ uint32_t BlankCheck(uint32_t adr, uint32_t sz, uint8_t pat)
     return RESULT_OK; 
 }
 
-uint32_t EraseChip(void)
+uint32_t eraseAll(void)
 {
 	/* Erases the entire of flash memory region both flash A & B */
 
@@ -114,7 +114,7 @@ uint32_t EraseChip(void)
 	return RESULT_OK;
 }
 
-uint32_t EraseSector(uint32_t adr)
+uint32_t erase_sector(uint32_t adr)
 {
 	/* Optional API */
 	/* Write call is doing erase by itself */
@@ -129,7 +129,7 @@ uint32_t EraseSector(uint32_t adr)
     return RESULT_OK;
 }
 
-uint32_t ProgramPage(uint32_t adr, uint32_t sz, uint32_t *buf)
+uint32_t program_page(uint32_t adr, uint32_t sz, uint32_t *buf)
 {
     boolean retVal = True;
 
@@ -153,7 +153,7 @@ uint32_t ProgramPage(uint32_t adr, uint32_t sz, uint32_t *buf)
     return RESULT_ERROR;		
 }
 
-uint32_t Verify(uint32_t adr, uint32_t sz, uint32_t *buf)
+uint32_t verify(uint32_t adr, uint32_t sz, uint32_t *buf)
 {
 	/* Optional API */
     return RESULT_OK;

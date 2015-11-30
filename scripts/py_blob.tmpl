@@ -30,9 +30,10 @@ flash_algo = {
     'begin_data' : {{entry}} + 0x00000A00,
     'begin_stack' : {{stack_pointer}},
     'page_size' : {{prog_page_size}},
+    'min_program_length' : {{prog_page_size}},
+    'analyzer_supported' : False,    
 };
               
 class Flash_{{name}}(Flash): 
     def __init__(self, target):
         super(Flash_{{name}}, self).__init__(target, flash_algo)
-
