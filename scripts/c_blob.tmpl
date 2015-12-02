@@ -41,5 +41,5 @@ static const program_target_t flash = {
     {{entry}},                // location to write prog_blob in target RAM
     sizeof({{name}}_flash_prog_blob), // prog_blob size
     {{name}}_flash_prog_blob,         // address of prog_blob
-    {{prog_page_size}}                 // ram_to_flash_bytes_to_be_written
+    512                 // ram_to_flash_bytes_to_be_written - should be less than 512 bytes or divisible into 512 (MSD only sends 512 bytes at a time)
 };
