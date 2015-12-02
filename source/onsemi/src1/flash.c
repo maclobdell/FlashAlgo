@@ -304,7 +304,8 @@ boolean fFlashWrite(flash_options_pt device, uint8_t **address, const uint8_t *b
 	//	fDmaStart((uint32_t) page_address, (uint32_t) GlobFlashPageCache, page_size);
 	//	fDmaStallUntilDone();
 	//memcpy((void *)page_address, (void *)GlobFlashPageCache, page_size);
-	memcpy((void *)page_address, (void *)buf, page_size);
+	/* Dap link program 512 bytes at a time, copy only the length that passed */
+	memcpy((void *)page_address, (void *)buf, len);
   
 	*address += len;
 
