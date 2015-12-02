@@ -268,13 +268,17 @@ boolean fFlashWrite(flash_options_pt device, uint8_t **address, const uint8_t *b
 		// Address is page aligned
 		if (len > FLASH_PAGE_SIZE)
 		{
+  		//length is larger than a page - not supported
 			return False;
 		}
 	} 
 	else 
 	{
-		if (len > ((uint32_t) (*address) % FLASH_PAGE_SIZE ))
+		//if (len > ((uint32_t) (*address) % FLASH_PAGE_SIZE ))
+		in_page_offset = (uint8_t*) ((uint32_t) (*address) & ~FLASH_PAGE_MASK );
+		if (len > ((uint32_t)FLASH_PAGE_SIZE - (uint32_t)in_page_offset ))	
 		{
+			//length is larger than amount of space remaining before the start of the next page - not supported
 			return False;
 		}
 	}
