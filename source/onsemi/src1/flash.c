@@ -175,10 +175,10 @@ void fFlashMassErase(flash_options_pt device)
 	 * in what flash needs to be erased. */
 	if (device->array_base_address & FLASH_B_OFFSET_MASK) 
 	{/* Flash device is on flash bank B. Add bank B offset to address. */
-		device->membase->ADDR = FLASH_B_OFFSET_MASK;
+		device->membase->ADDR = FLASH_B_USER_AREA_OFFSET;
 	} else 
 	{
-		device->membase->ADDR = FLASH_A_OFFSET_MASK;
+		device->membase->ADDR = FLASH_A_USER_AREA_OFFSET;
 	}
 
 	fFlashUnlock(device);
