@@ -59,9 +59,9 @@
 #endif
 
 #define FLASH_A_OFFSET_MASK				(uint32_t)0x00000000
-#define FLASH_A_USER_AREA_OFFSET		(uint32_t)0x00003000
+#define FLASH_A_USER_AREA_OFFSET		(uint32_t)0x00002000
 #define FLASH_B_OFFSET_MASK				(uint32_t)0x00100000
-#define FLASH_B_USER_AREA_OFFSET		(uint32_t)0x00103000
+#define FLASH_B_USER_AREA_OFFSET		(uint32_t)0x00102000
 #define FLASH_B_OFFSET_SHIFT			(uint8_t)20
 
 #define FLASHREG_BASE		        	((uint32_t)0x40017000)
