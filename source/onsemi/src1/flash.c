@@ -235,7 +235,7 @@ boolean fFlashWrite(flash_options_pt device, uint8_t **address, const uint8_t *b
 	destination = (uint8_t*) (*address);
 
 	//fprintf("Destination = %0x", destination);
-    page_address = (uint8_t*) ((uint32_t) destination & FLASH_PAGE_MASK );
+  page_address = (uint8_t*) ((uint32_t) destination & FLASH_PAGE_MASK );
 	page_size = FLASH_PAGE_SIZE;
        
 	if ((uint32_t) (*address) < (FLASH_NR_INFO_BLOCK_PAGES * FLASH_PAGE_SIZE_INFO_BLOCK )) 
@@ -255,7 +255,9 @@ boolean fFlashWrite(flash_options_pt device, uint8_t **address, const uint8_t *b
 		}
 		else 
 		{
-			if (len > ((uint32_t) (*address) % FLASH_PAGE_SIZE_INFO_BLOCK ))
+			//if (len > ((uint32_t) (*address) % FLASH_PAGE_SIZE_INFO_BLOCK ))
+			in_page_offset = (uint8_t*) ((uint32_t) (*address) & ~FLASH_FIRST_PAGE_MASK );
+			if (len > ((uint32_t)FLASH_PAGE_SIZE_INFO_BLOCK - (uint32_t)in_page_offset ))	
 			{
 				return False;
 			}
@@ -311,7 +313,7 @@ boolean fFlashWrite(flash_options_pt device, uint8_t **address, const uint8_t *b
 	/* Dap link program 512 bytes at a time, copy only the length that passed */
 	memcpy((void *)destination, (void *)buf, len);
   
-	*address += len;
+//	*address += len;
 
 	return True;
 }
