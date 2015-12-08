@@ -25,7 +25,7 @@ struct FlashDevice const FlashDevice = {
     FLASH_DRV_VERS,             // Driver Version, do not modify!
     DEVICE_NAME,                // Device Name (128 chars max)
     ONCHIP,                     // Device Type
-    0x00003000,                 // Device Start Address
+    0x00002000,                 // Device Start Address
     0x0004F000,                 // Device Size
     0x00000800,                 // Programming Page Size
     0x00000000,                 // Reserved, must be 0
