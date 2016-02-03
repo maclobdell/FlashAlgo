@@ -228,22 +228,16 @@ boolean fFlashRead(flash_options_pt device, uint8_t **address, uint8_t * const b
 boolean fFlashWrite(flash_options_pt device, uint8_t **address, const uint8_t *buf, uint32_t len)
 {
 	uint8_t *destination;
-	uint8_t *page_address;
-	uint32_t page_size;
 	uint8_t *in_page_offset;
         
 	destination = (uint8_t*) (*address);
 
 	//fprintf("Destination = %0x", destination);
-  page_address = (uint8_t*) ((uint32_t) destination & FLASH_PAGE_MASK );
-	page_size = FLASH_PAGE_SIZE;
        
 	if ((uint32_t) (*address) < (FLASH_NR_INFO_BLOCK_PAGES * FLASH_PAGE_SIZE_INFO_BLOCK )) 
 	{
 		// First page write requested, info block has FLASH_NR_INFO_BLOCK_PAGES pages of size FLASH_PAGE_SIZE_INFO_BLOCK.
 
-		page_address = (uint8_t*) ((uint32_t) destination & FLASH_FIRST_PAGE_MASK );
-		page_size = FLASH_PAGE_SIZE_INFO_BLOCK;
 		/* No support for crossing page boundary */
 		if (((uint32_t) (*address) % FLASH_PAGE_SIZE_INFO_BLOCK ) == 0) 
 		{

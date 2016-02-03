@@ -103,7 +103,7 @@ void fClockInit(void);
  * The function checks and returns peripheral clock frequency
  * @return Peripheral clock frequency
  */
-uint32_t fClockGetPeriphClockfrequency();
+uint32_t fClockGetPeriphClockfrequency(void);
 
 /** Function to get peripheral clock frequency
  * @details
@@ -113,7 +113,7 @@ uint32_t fClockGetPeriphClockfrequency();
  * - External 32.768kHz oscillator
  * @return 32kHz clock domain frequency
  */
-uint16_t fClockGet32kClockfrequency();
+uint16_t fClockGet32kClockfrequency(void);
 
 /** Function to enable peripheral clock
  * @details

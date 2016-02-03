@@ -117,40 +117,45 @@ uint32_t eraseAll(void)
 
 uint32_t erase_sector(uint32_t adr)
 {
-	/* Optional API */
-	/* Write call is doing erase by itself */
-	if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK)
-	{/* Flash B */
-		fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_PAGE_ERASE_REQUEST, &adr);
+	if(adr >= FLASH_A_USER_AREA_OFFSET)
+	{
+		/* Optional API */
+		/* Write call is doing erase by itself */
+		if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK)
+		{/* Flash B */
+			fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_PAGE_ERASE_REQUEST, &adr);
+		}
+		else
+		{/* Flash A */
+			fFlashIoctl((flash_options_pt)&GlobFlashOptionsA, FLASH_PAGE_ERASE_REQUEST, &adr);
+		}
+		return RESULT_OK;
 	}
-	else
-	{/* Flash A */
-		fFlashIoctl((flash_options_pt)&GlobFlashOptionsA, FLASH_PAGE_ERASE_REQUEST, &adr);
-	}
-    return RESULT_OK;
+	return RESULT_ERROR;
 }
 
 uint32_t program_page(uint32_t adr, uint32_t sz, uint32_t *buf)
 {
-    boolean retVal = True;
-
-	/* Write to flash A or Flash B depending on the flash bank in use */
-	if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK) 
+	boolean retVal = True;
+	if(adr >= FLASH_A_USER_AREA_OFFSET)
 	{
-		retVal = fFlashWrite((flash_options_pt)&GlobFlashOptionsB,(uint8_t **)&adr,
-                                           (uint8_t const *)buf,sz);
-    } 
-	else 
-	{
-        retVal = fFlashWrite((flash_options_pt)&GlobFlashOptionsA,(uint8_t **)&adr,
-                                           (uint8_t const *)buf,sz); 
-    }
-    
-    if(retVal == True)  
-    {
-      return RESULT_OK;
-    }  
-    
+		/* Write to flash A or Flash B depending on the flash bank in use */
+		if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK) 
+		{
+			retVal = fFlashWrite((flash_options_pt)&GlobFlashOptionsB,(uint8_t **)&adr,
+											   (uint8_t const *)buf,sz);
+		} 
+		else 
+		{
+			retVal = fFlashWrite((flash_options_pt)&GlobFlashOptionsA,(uint8_t **)&adr,
+											   (uint8_t const *)buf,sz); 
+		}
+		
+		if(retVal == True)  
+		{
+		  return RESULT_OK;
+		}  
+	}
     return RESULT_ERROR;		
 }
 
