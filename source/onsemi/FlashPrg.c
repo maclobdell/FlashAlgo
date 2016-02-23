@@ -93,7 +93,7 @@ uint32_t uninit(uint32_t fnc)
     //  Fnc parameter has meaning but isnt used in MSC program
     //  routines
 
-   	/* TODO Optional API? */
+   	/* Optional API */
 
     return RESULT_OK;
 }
@@ -119,8 +119,6 @@ uint32_t erase_sector(uint32_t adr)
 {
 	if(adr >= FLASH_A_USER_AREA_OFFSET)
 	{
-		/* Optional API */
-		/* Write call is doing erase by itself */
 		if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK)
 		{/* Flash B */
 			fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_PAGE_ERASE_REQUEST, &adr);
