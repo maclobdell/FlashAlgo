@@ -35,45 +35,45 @@
 //MPL
 #define SIREV 3
 
-#define FLASH_MASS_ERASE_REQUEST 		(uint8_t)0x01
-#define FLASH_PAGE_ERASE_REQUEST 		(uint8_t)0x02
-#define FLASH_POWER_UP					(uint8_t)0x03
-#define FLASH_POWER_DOWN				(uint8_t)0x04
-#define FLASH_WAIT_UNTIL_DONE			(uint8_t)0x05
+#define FLASH_MASS_ERASE_REQUEST           (uint8_t)0x01
+#define FLASH_PAGE_ERASE_REQUEST           (uint8_t)0x02
+#define FLASH_POWER_UP                     (uint8_t)0x03
+#define FLASH_POWER_DOWN                    (uint8_t)0x04
+#define FLASH_WAIT_UNTIL_DONE               (uint8_t)0x05
 
 #if (SIREV == 2)
-#define FLASH_PAGE_SIZE					(uint16_t)0x1000
-#define FLASH_PAGE_SIZE_INFO_BLOCK		(uint16_t)0x1000
-#define FLASH_NR_INFO_BLOCK_PAGES		(uint8_t)0x02
-#define FLASH_PAGE_MASK					(uint32_t)0xFFFFF000
-#define FLASH_FIRST_PAGE_MASK			(uint32_t)0xFFFFF000
+#define FLASH_PAGE_SIZE                     (uint16_t)0x1000
+#define FLASH_PAGE_SIZE_INFO_BLOCK          (uint16_t)0x1000
+#define FLASH_NR_INFO_BLOCK_PAGES           (uint8_t)0x02
+#define FLASH_PAGE_MASK                     (uint32_t)0xFFFFF000
+#define FLASH_FIRST_PAGE_MASK               (uint32_t)0xFFFFF000
 
 #endif
 
 #if (SIREV == 3)
-#define FLASH_PAGE_SIZE					(uint16_t)0x800
-#define FLASH_PAGE_SIZE_INFO_BLOCK		(uint16_t)0x800
-#define FLASH_NR_INFO_BLOCK_PAGES		(uint8_t)0x04
-#define FLASH_PAGE_MASK					(uint32_t)0xFFFFF800
-#define FLASH_FIRST_PAGE_MASK			(uint32_t)0xFFFFF800
+#define FLASH_PAGE_SIZE                     (uint16_t)0x800
+#define FLASH_PAGE_SIZE_INFO_BLOCK          (uint16_t)0x800
+#define FLASH_NR_INFO_BLOCK_PAGES           (uint8_t)0x04
+#define FLASH_PAGE_MASK                     (uint32_t)0xFFFFF800
+#define FLASH_FIRST_PAGE_MASK               (uint32_t)0xFFFFF800
 #endif
 
-#define FLASH_A_OFFSET_MASK				(uint32_t)0x00000000
-#define FLASH_A_USER_AREA_OFFSET		(uint32_t)0x00002000
-#define FLASH_B_OFFSET_MASK				(uint32_t)0x00100000
-#define FLASH_B_USER_AREA_OFFSET		(uint32_t)0x00102000
-#define FLASH_B_OFFSET_SHIFT			(uint8_t)20
+#define FLASH_A_OFFSET_MASK                 (uint32_t)0x00000000
+#define FLASH_A_USER_AREA_OFFSET            (uint32_t)0x00002000
+#define FLASH_B_OFFSET_MASK                 (uint32_t)0x00100000
+#define FLASH_B_USER_AREA_OFFSET            (uint32_t)0x00102000
+#define FLASH_B_OFFSET_SHIFT                (uint8_t)20
 
-#define FLASHREG_BASE		        	((uint32_t)0x40017000)
-#define FLASHREG						((FlashReg_t *)FLASHREG_BASE)
+#define FLASHREG_BASE                       ((uint32_t)0x40017000)
+#define FLASHREG                            ((FlashReg_t *)FLASHREG_BASE)
 
 /* Only one controll register for both flash banks,
  * Only one interrupt line for both, hence, no irqn here.
  */
 typedef struct flash_options {
-	uint32_t	array_base_address;	/**< Base address of the array, word aligned */
-	FlashReg_pt	membase;
-	IRQn_Type 	irq; 					/**< The IRQ number of the IRQ associated to the device. */
+     uint32_t       array_base_address;     /**< Base address of the array, word aligned */
+     FlashReg_pt    membase;
+     IRQn_Type      irq;                  /**< The IRQ number of the IRQ associated to the device. */
 } flash_options_t, *flash_options_pt;
 
 /**
