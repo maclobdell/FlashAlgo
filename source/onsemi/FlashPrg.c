@@ -25,25 +25,29 @@
 #include "FlashOS.h"
 #include "FlashPrg.h"
 
-#define RESULT_OK		0
-#define RESULT_ERROR	1
+#define RESULT_OK                  0
+#define RESULT_ERROR               1
+#define DEVICE_OPT_REG_ADRS        (uint32_t)0x4001E000
+#define DEVICE_OPT_ALL_FEATURE_EN  (uint32_t)0x2082353F
 
 void fInitGobjects(void);
 void fInitRam(void);  
 
+static boolean FlashBRequired;
+
 /** Global flash A device options */
 const flash_options_t GlobFlashOptionsA = 
 {
-	0x00000000,
-	FLASHREG,
-	Flash_IRQn
+    0x00000000,
+    FLASHREG,
+    Flash_IRQn
 };
 /** Global flash B device options */
 const flash_options_t GlobFlashOptionsB = 
 {
-	0x00100000,
-	FLASHREG,
-	Flash_IRQn
+    0x00100000,
+    FLASHREG,
+    Flash_IRQn
 };
 
 uint8_t numDev;
@@ -54,10 +58,14 @@ uint32_t init(uint32_t adr, uint32_t clk, uint32_t fnc)
     //  watchdogs, peripherals and anything else needed to
     //  access or program memory. Fnc parameter has meaning
     //  but currently isnt used in MSC programming routines
-  
-	CLOCK_ENABLE(CLOCK_FLASH);
 
-	/* Disable all interrupts */
+    CLOCK_ENABLE(CLOCK_FLASH);
+    CLOCK_ENABLE(CLOCK_DMA);
+
+    volatile uint32_t *devreg = (uint32_t *)DEVICE_OPT_REG_ADRS;
+    *devreg = DEVICE_OPT_ALL_FEATURE_EN;
+
+    /* Disable all interrupts */
     NVIC->ICER[0] = 0x1F;
     /* Clear all Pending interrupts */
     NVIC->ICPR[0] = 0x1F;
@@ -69,21 +77,12 @@ uint32_t init(uint32_t adr, uint32_t clk, uint32_t fnc)
      * from this download */
     __DSB();
     /* MSbit = 0 vector table in code region, 1 vector table in ram region */
-	SCB->VTOR = (uint32_t)&__Vectors;   
-	__DSB();
+    SCB->VTOR = (uint32_t)&__Vectors;   
+    __DSB();
 #endif
 
-	if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK)
-	{
-		fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_POWER_UP, 0);
-		fFlashIoctl((flash_options_pt)&GlobFlashOptionsA, FLASH_POWER_DOWN, 0);
-	} 
-	else 
-	{
-	    fFlashIoctl((flash_options_pt)&GlobFlashOptionsA, FLASH_POWER_UP, 0);
-		fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_POWER_DOWN, 0);
-     }
-     return RESULT_OK;
+    fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_POWER_UP, 0);
+    return RESULT_OK;
 }
 
 uint32_t uninit(uint32_t fnc)
@@ -93,72 +92,75 @@ uint32_t uninit(uint32_t fnc)
     //  Fnc parameter has meaning but isnt used in MSC program
     //  routines
 
-   	/* Optional API */
-
+    /* Optional API */
+    
     return RESULT_OK;
 }
 
 uint32_t BlankCheck(uint32_t adr, uint32_t sz, uint8_t pat)
 {
-	/* Optional API */
+    /* Optional API */
     return RESULT_OK; 
 }
 
 uint32_t eraseAll(void)
 {
-	/* Erases the entire of flash memory region both flash A & B */
+    /* Erases the entire of flash memory region both flash A & B */
 
-	fFlashMassErase((flash_options_pt)&GlobFlashOptionsA);
-	/*Shall we leave flash b alone and let in-application-programming handle its contents?*/
-	//fFlashMassErase((flash_options_pt)&GlobFlashOptionsB);
+    fFlashMassErase((flash_options_pt)&GlobFlashOptionsA);
+    /*Shall we leave flash b alone and let in-application-programming handle its contents?*/
+    fFlashMassErase((flash_options_pt)&GlobFlashOptionsB);
    
-	return RESULT_OK;
+    return RESULT_OK;
 }
 
 uint32_t erase_sector(uint32_t adr)
 {
-	if(adr >= FLASH_A_USER_AREA_OFFSET)
-	{
-		if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK)
-		{/* Flash B */
-			fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_PAGE_ERASE_REQUEST, &adr);
-		}
-		else
-		{/* Flash A */
-			fFlashIoctl((flash_options_pt)&GlobFlashOptionsA, FLASH_PAGE_ERASE_REQUEST, &adr);
-		}
-		return RESULT_OK;
-	}
-	return RESULT_ERROR;
+    if(adr >= FLASH_A_USER_AREA_OFFSET)
+    {
+        if((adr >= 0x2000) && (adr < 0x52000)) 
+        {
+            fFlashIoctl((flash_options_pt)&GlobFlashOptionsA, FLASH_PAGE_ERASE_REQUEST, &adr);
+        }
+        else if ((adr >= 0x52000) && (adr < 0xA2000)) 
+        {
+            adr += 0xB0000;
+            fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_PAGE_ERASE_REQUEST, &adr);
+        }
+        return RESULT_OK;
+    }
+    return RESULT_ERROR;
 }
 
 uint32_t program_page(uint32_t adr, uint32_t sz, uint32_t *buf)
 {
-	boolean retVal = True;
-	if(adr >= FLASH_A_USER_AREA_OFFSET)
-	{
-		/* Write to flash A or Flash B depending on the flash bank in use */
-		if ((adr & FLASH_B_OFFSET_MASK) == FLASH_B_OFFSET_MASK) 
-		{
-			retVal = fFlashWrite((flash_options_pt)&GlobFlashOptionsB,(uint8_t **)&adr,
-											   (uint8_t const *)buf,sz);
-		} 
-		else 
-		{
-			retVal = fFlashWrite((flash_options_pt)&GlobFlashOptionsA,(uint8_t **)&adr,
-											   (uint8_t const *)buf,sz); 
-		}
-		
-		if(retVal == True)  
-		{
-		  return RESULT_OK;
-		}  
-	}
-    return RESULT_ERROR;		
+    boolean retVal = True;
+
+    if(adr >= FLASH_A_USER_AREA_OFFSET)
+    {
+        /* Write to flash A or Flash B depending on the flash bank in use */
+        if((adr >= 0x2000) && (adr < 0x52000)) 
+        {
+            retVal = fFlashWrite((flash_options_pt)&GlobFlashOptionsA,(uint8_t **)&adr,
+                                               (uint8_t const *)buf,sz); 
+        }
+        else if ((adr >= 0x52000) && (adr < 0xA2000)) 
+        {
+            adr += 0xB0000;
+            retVal = fFlashWrite((flash_options_pt)&GlobFlashOptionsB,(uint8_t **)&adr,
+                                               (uint8_t const *)buf,sz);
+        } 
+
+        if(retVal == True)  
+        {
+          return RESULT_OK;
+        }  
+    }
+    return RESULT_ERROR;
 }
 
 uint32_t verify(uint32_t adr, uint32_t sz, uint32_t *buf)
 {
-	/* Optional API */
+    /* Optional API */
     return RESULT_OK;
 }
