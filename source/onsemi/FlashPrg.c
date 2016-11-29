@@ -58,7 +58,6 @@ uint32_t init(uint32_t adr, uint32_t clk, uint32_t fnc)
     //  watchdogs, peripherals and anything else needed to
     //  access or program memory. Fnc parameter has meaning
     //  but currently isnt used in MSC programming routines
-    FlashBRequired = False;
 
     CLOCK_ENABLE(CLOCK_FLASH);
     CLOCK_ENABLE(CLOCK_DMA);
@@ -95,11 +94,6 @@ uint32_t uninit(uint32_t fnc)
 
     /* Optional API */
     
-    if(FlashBRequired == False)
-    {
-        fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_POWER_DOWN, 0);
-    }
-
     return RESULT_OK;
 }
 
@@ -130,7 +124,6 @@ uint32_t erase_sector(uint32_t adr)
         }
         else if ((adr >= 0x52000) && (adr < 0xA2000)) 
         {
-            FlashBRequired = True;
             adr += 0xB0000;
             fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_PAGE_ERASE_REQUEST, &adr);
         }
@@ -158,7 +151,6 @@ uint32_t program_page(uint32_t adr, uint32_t sz, uint32_t *buf)
                                                (uint8_t const *)buf,sz);
         } 
 
-        
         if(retVal == True)  
         {
           return RESULT_OK;
