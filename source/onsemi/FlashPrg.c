@@ -19,7 +19,7 @@
 
 #include "system_ARMCM3.h"
 #include "core_cm3.h"
-#include "types.h" 
+#include "types.h"
 #include "flash.h"
 #include "clock.h"
 #include "FlashOS.h"
@@ -31,19 +31,17 @@
 #define DEVICE_OPT_ALL_FEATURE_EN  (uint32_t)0x2082353F
 
 void fInitGobjects(void);
-void fInitRam(void);  
-
-static boolean FlashBRequired;
+void fInitRam(void);
 
 /** Global flash A device options */
-const flash_options_t GlobFlashOptionsA = 
+const flash_options_t GlobFlashOptionsA =
 {
     0x00000000,
     FLASHREG,
     Flash_IRQn
 };
 /** Global flash B device options */
-const flash_options_t GlobFlashOptionsB = 
+const flash_options_t GlobFlashOptionsB =
 {
     0x00100000,
     FLASHREG,
@@ -77,7 +75,7 @@ uint32_t init(uint32_t adr, uint32_t clk, uint32_t fnc)
      * from this download */
     __DSB();
     /* MSbit = 0 vector table in code region, 1 vector table in ram region */
-    SCB->VTOR = (uint32_t)&__Vectors;   
+    SCB->VTOR = (uint32_t)&__Vectors;
     __DSB();
 #endif
 
@@ -93,14 +91,14 @@ uint32_t uninit(uint32_t fnc)
     //  routines
 
     /* Optional API */
-    
+
     return RESULT_OK;
 }
 
 uint32_t BlankCheck(uint32_t adr, uint32_t sz, uint8_t pat)
 {
     /* Optional API */
-    return RESULT_OK; 
+    return RESULT_OK;
 }
 
 uint32_t eraseAll(void)
@@ -110,7 +108,7 @@ uint32_t eraseAll(void)
     fFlashMassErase((flash_options_pt)&GlobFlashOptionsA);
     /*Shall we leave flash b alone and let in-application-programming handle its contents?*/
     fFlashMassErase((flash_options_pt)&GlobFlashOptionsB);
-   
+
     return RESULT_OK;
 }
 
@@ -118,11 +116,11 @@ uint32_t erase_sector(uint32_t adr)
 {
     if(adr >= FLASH_A_USER_AREA_OFFSET)
     {
-        if((adr >= 0x2000) && (adr < 0x52000)) 
+        if((adr >= 0x2000) && (adr < 0x52000))
         {
             fFlashIoctl((flash_options_pt)&GlobFlashOptionsA, FLASH_PAGE_ERASE_REQUEST, &adr);
         }
-        else if ((adr >= 0x00100000) && (adr < 0x00152000)) 
+        else if ((adr >= 0x00102000) && (adr < 0x00152000))
         {
             fFlashIoctl((flash_options_pt)&GlobFlashOptionsB, FLASH_PAGE_ERASE_REQUEST, &adr);
         }
@@ -138,21 +136,21 @@ uint32_t program_page(uint32_t adr, uint32_t sz, uint32_t *buf)
     if(adr >= FLASH_A_USER_AREA_OFFSET)
     {
         /* Write to flash A or Flash B depending on the flash bank in use */
-        if((adr >= 0x2000) && (adr < 0x52000)) 
+        if((adr >= 0x2000) && (adr < 0x52000))
         {
             retVal = fFlashWrite((flash_options_pt)&GlobFlashOptionsA,(uint8_t **)&adr,
-                                               (uint8_t const *)buf,sz); 
+                                               (uint8_t const *)buf,sz);
         }
-        else if ((adr >= 0x00100000) && (adr < 0x00152000)) 
+        else if ((adr >= 0x00102000) && (adr < 0x00152000))
         {
             retVal = fFlashWrite((flash_options_pt)&GlobFlashOptionsB,(uint8_t **)&adr,
                                                (uint8_t const *)buf,sz);
-        } 
+        }
 
-        if(retVal == True)  
+        if(retVal == True)
         {
           return RESULT_OK;
-        }  
+        }
     }
     return RESULT_ERROR;
 }
